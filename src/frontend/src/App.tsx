@@ -4,9 +4,12 @@ import Header from "@/components/Header";
 import { Toaster } from "@/components/ui/sonner";
 import { CartProvider } from "@/context/CartContext";
 import About from "@/pages/About";
+import Admin from "@/pages/Admin";
+import Checkout from "@/pages/Checkout";
 import Contact from "@/pages/Contact";
 import CustomOrders from "@/pages/CustomOrders";
 import Home from "@/pages/Home";
+import MyOrders from "@/pages/MyOrders";
 import Shop from "@/pages/Shop";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
@@ -55,6 +58,21 @@ const contactRoute = createRoute({
   path: "/contact",
   component: Contact,
 });
+const adminRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/admin",
+  component: Admin,
+});
+const checkoutRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/checkout",
+  component: Checkout,
+});
+const myOrdersRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/my-orders",
+  component: MyOrders,
+});
 
 const routeTree = rootRoute.addChildren([
   homeRoute,
@@ -62,6 +80,9 @@ const routeTree = rootRoute.addChildren([
   customOrdersRoute,
   aboutRoute,
   contactRoute,
+  adminRoute,
+  checkoutRoute,
+  myOrdersRoute,
 ]);
 
 const router = createRouter({ routeTree });

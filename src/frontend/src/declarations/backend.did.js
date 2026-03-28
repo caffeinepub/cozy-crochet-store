@@ -43,12 +43,48 @@ export const UserRole = IDL.Variant({
   'user' : IDL.Null,
   'guest' : IDL.Null,
 });
+export const ShoppingItem = IDL.Record({
+  'productName' : IDL.Text,
+  'currency' : IDL.Text,
+  'quantity' : IDL.Nat,
+  'priceInCents' : IDL.Nat,
+  'productDescription' : IDL.Text,
+});
 export const OrderRequest = IDL.Record({
   'id' : IDL.Nat,
   'customerName' : IDL.Text,
   'description' : IDL.Text,
   'email' : IDL.Text,
   'itemType' : IDL.Text,
+});
+export const OrderStatus = IDL.Variant({
+  'shipped' : IDL.Null,
+  'pending' : IDL.Null,
+  'paid' : IDL.Null,
+  'delivered' : IDL.Null,
+});
+export const ShippingAddress = IDL.Record({
+  'zip' : IDL.Text,
+  'country' : IDL.Text,
+  'city' : IDL.Text,
+  'name' : IDL.Text,
+  'state' : IDL.Text,
+  'addressLine' : IDL.Text,
+  'phone' : IDL.Text,
+});
+export const CartItem = IDL.Record({
+  'productId' : IDL.Nat,
+  'quantity' : IDL.Nat,
+});
+export const Order = IDL.Record({
+  'id' : IDL.Nat,
+  'status' : OrderStatus,
+  'customer' : IDL.Principal,
+  'createdAt' : IDL.Nat,
+  'email' : IDL.Text,
+  'shippingAddress' : ShippingAddress,
+  'items' : IDL.Vec(CartItem),
+  'paymentIntentId' : IDL.Opt(IDL.Text),
 });
 export const Review = IDL.Record({
   'id' : IDL.Nat,
@@ -57,10 +93,6 @@ export const Review = IDL.Record({
   'rating' : IDL.Nat,
 });
 export const UserProfile = IDL.Record({ 'name' : IDL.Text });
-export const CartItem = IDL.Record({
-  'productId' : IDL.Nat,
-  'quantity' : IDL.Nat,
-});
 export const Product = IDL.Record({
   'id' : IDL.Nat,
   'name' : IDL.Text,
@@ -68,6 +100,40 @@ export const Product = IDL.Record({
   'category' : IDL.Text,
   'image' : ExternalBlob,
   'price' : IDL.Float64,
+});
+export const StripeSessionStatus = IDL.Variant({
+  'completed' : IDL.Record({
+    'userPrincipal' : IDL.Opt(IDL.Text),
+    'response' : IDL.Text,
+  }),
+  'failed' : IDL.Record({ 'error' : IDL.Text }),
+});
+export const OrderInput = IDL.Record({
+  'email' : IDL.Text,
+  'shippingAddress' : ShippingAddress,
+  'items' : IDL.Vec(CartItem),
+});
+export const StripeConfiguration = IDL.Record({
+  'allowedCountries' : IDL.Vec(IDL.Text),
+  'secretKey' : IDL.Text,
+});
+export const http_header = IDL.Record({
+  'value' : IDL.Text,
+  'name' : IDL.Text,
+});
+export const http_request_result = IDL.Record({
+  'status' : IDL.Nat,
+  'body' : IDL.Vec(IDL.Nat8),
+  'headers' : IDL.Vec(http_header),
+});
+export const TransformationInput = IDL.Record({
+  'context' : IDL.Vec(IDL.Nat8),
+  'response' : http_request_result,
+});
+export const TransformationOutput = IDL.Record({
+  'status' : IDL.Nat,
+  'body' : IDL.Vec(IDL.Nat8),
+  'headers' : IDL.Vec(http_header),
 });
 
 export const idlService = IDL.Service({
@@ -99,25 +165,47 @@ export const idlService = IDL.Service({
   '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
   'addOrderRequest' : IDL.Func([OrderRequestInput], [IDL.Nat], []),
-  'addProduct' : IDL.Func([ProductInput], [IDL.Nat], []),
+  'addProduct' : IDL.Func([ProductInput], [], []),
   'addReview' : IDL.Func([ReviewInput], [IDL.Nat], []),
   'addToCart' : IDL.Func([IDL.Nat, IDL.Nat], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+  'claimAdminByPassword' : IDL.Func([IDL.Text], [IDL.Bool], []),
+  'clearCart' : IDL.Func([], [], []),
+  'createCheckoutSession' : IDL.Func(
+      [IDL.Vec(ShoppingItem), IDL.Text, IDL.Text],
+      [IDL.Text],
+      [],
+    ),
+  'deleteProduct' : IDL.Func([IDL.Nat], [], []),
   'getAllOrderRequests' : IDL.Func([], [IDL.Vec(OrderRequest)], ['query']),
+  'getAllOrders' : IDL.Func([], [IDL.Vec(Order)], ['query']),
   'getAllReviews' : IDL.Func([], [IDL.Vec(Review)], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getCart' : IDL.Func([], [IDL.Opt(IDL.Vec(CartItem))], ['query']),
+  'getMyOrders' : IDL.Func([], [IDL.Vec(Order)], ['query']),
+  'getOrder' : IDL.Func([IDL.Nat], [IDL.Opt(Order)], ['query']),
   'getProducts' : IDL.Func([], [IDL.Vec(Product)], ['query']),
+  'getStripeSessionStatus' : IDL.Func([IDL.Text], [StripeSessionStatus], []),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
       [IDL.Opt(UserProfile)],
       ['query'],
     ),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+  'isStripeConfigured' : IDL.Func([], [IDL.Bool], ['query']),
+  'placeOrder' : IDL.Func([OrderInput], [IDL.Nat], []),
   'removeFromCart' : IDL.Func([IDL.Nat], [], []),
-  'removeProduct' : IDL.Func([IDL.Nat], [], []),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+  'setStripeConfiguration' : IDL.Func([StripeConfiguration], [], []),
+  'transform' : IDL.Func(
+      [TransformationInput],
+      [TransformationOutput],
+      ['query'],
+    ),
+  'updateOrderPaymentIntent' : IDL.Func([IDL.Nat, IDL.Text], [], []),
+  'updateOrderStatus' : IDL.Func([IDL.Nat, OrderStatus], [], []),
+  'updateProduct' : IDL.Func([IDL.Nat, ProductInput], [], []),
 });
 
 export const idlInitArgs = [];
@@ -158,12 +246,45 @@ export const idlFactory = ({ IDL }) => {
     'user' : IDL.Null,
     'guest' : IDL.Null,
   });
+  const ShoppingItem = IDL.Record({
+    'productName' : IDL.Text,
+    'currency' : IDL.Text,
+    'quantity' : IDL.Nat,
+    'priceInCents' : IDL.Nat,
+    'productDescription' : IDL.Text,
+  });
   const OrderRequest = IDL.Record({
     'id' : IDL.Nat,
     'customerName' : IDL.Text,
     'description' : IDL.Text,
     'email' : IDL.Text,
     'itemType' : IDL.Text,
+  });
+  const OrderStatus = IDL.Variant({
+    'shipped' : IDL.Null,
+    'pending' : IDL.Null,
+    'paid' : IDL.Null,
+    'delivered' : IDL.Null,
+  });
+  const ShippingAddress = IDL.Record({
+    'zip' : IDL.Text,
+    'country' : IDL.Text,
+    'city' : IDL.Text,
+    'name' : IDL.Text,
+    'state' : IDL.Text,
+    'addressLine' : IDL.Text,
+    'phone' : IDL.Text,
+  });
+  const CartItem = IDL.Record({ 'productId' : IDL.Nat, 'quantity' : IDL.Nat });
+  const Order = IDL.Record({
+    'id' : IDL.Nat,
+    'status' : OrderStatus,
+    'customer' : IDL.Principal,
+    'createdAt' : IDL.Nat,
+    'email' : IDL.Text,
+    'shippingAddress' : ShippingAddress,
+    'items' : IDL.Vec(CartItem),
+    'paymentIntentId' : IDL.Opt(IDL.Text),
   });
   const Review = IDL.Record({
     'id' : IDL.Nat,
@@ -172,7 +293,6 @@ export const idlFactory = ({ IDL }) => {
     'rating' : IDL.Nat,
   });
   const UserProfile = IDL.Record({ 'name' : IDL.Text });
-  const CartItem = IDL.Record({ 'productId' : IDL.Nat, 'quantity' : IDL.Nat });
   const Product = IDL.Record({
     'id' : IDL.Nat,
     'name' : IDL.Text,
@@ -180,6 +300,37 @@ export const idlFactory = ({ IDL }) => {
     'category' : IDL.Text,
     'image' : ExternalBlob,
     'price' : IDL.Float64,
+  });
+  const StripeSessionStatus = IDL.Variant({
+    'completed' : IDL.Record({
+      'userPrincipal' : IDL.Opt(IDL.Text),
+      'response' : IDL.Text,
+    }),
+    'failed' : IDL.Record({ 'error' : IDL.Text }),
+  });
+  const OrderInput = IDL.Record({
+    'email' : IDL.Text,
+    'shippingAddress' : ShippingAddress,
+    'items' : IDL.Vec(CartItem),
+  });
+  const StripeConfiguration = IDL.Record({
+    'allowedCountries' : IDL.Vec(IDL.Text),
+    'secretKey' : IDL.Text,
+  });
+  const http_header = IDL.Record({ 'value' : IDL.Text, 'name' : IDL.Text });
+  const http_request_result = IDL.Record({
+    'status' : IDL.Nat,
+    'body' : IDL.Vec(IDL.Nat8),
+    'headers' : IDL.Vec(http_header),
+  });
+  const TransformationInput = IDL.Record({
+    'context' : IDL.Vec(IDL.Nat8),
+    'response' : http_request_result,
+  });
+  const TransformationOutput = IDL.Record({
+    'status' : IDL.Nat,
+    'body' : IDL.Vec(IDL.Nat8),
+    'headers' : IDL.Vec(http_header),
   });
   
   return IDL.Service({
@@ -211,25 +362,47 @@ export const idlFactory = ({ IDL }) => {
     '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
     'addOrderRequest' : IDL.Func([OrderRequestInput], [IDL.Nat], []),
-    'addProduct' : IDL.Func([ProductInput], [IDL.Nat], []),
+    'addProduct' : IDL.Func([ProductInput], [], []),
     'addReview' : IDL.Func([ReviewInput], [IDL.Nat], []),
     'addToCart' : IDL.Func([IDL.Nat, IDL.Nat], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+    'claimAdminByPassword' : IDL.Func([IDL.Text], [IDL.Bool], []),
+    'clearCart' : IDL.Func([], [], []),
+    'createCheckoutSession' : IDL.Func(
+        [IDL.Vec(ShoppingItem), IDL.Text, IDL.Text],
+        [IDL.Text],
+        [],
+      ),
+    'deleteProduct' : IDL.Func([IDL.Nat], [], []),
     'getAllOrderRequests' : IDL.Func([], [IDL.Vec(OrderRequest)], ['query']),
+    'getAllOrders' : IDL.Func([], [IDL.Vec(Order)], ['query']),
     'getAllReviews' : IDL.Func([], [IDL.Vec(Review)], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getCart' : IDL.Func([], [IDL.Opt(IDL.Vec(CartItem))], ['query']),
+    'getMyOrders' : IDL.Func([], [IDL.Vec(Order)], ['query']),
+    'getOrder' : IDL.Func([IDL.Nat], [IDL.Opt(Order)], ['query']),
     'getProducts' : IDL.Func([], [IDL.Vec(Product)], ['query']),
+    'getStripeSessionStatus' : IDL.Func([IDL.Text], [StripeSessionStatus], []),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(UserProfile)],
         ['query'],
       ),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+    'isStripeConfigured' : IDL.Func([], [IDL.Bool], ['query']),
+    'placeOrder' : IDL.Func([OrderInput], [IDL.Nat], []),
     'removeFromCart' : IDL.Func([IDL.Nat], [], []),
-    'removeProduct' : IDL.Func([IDL.Nat], [], []),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+    'setStripeConfiguration' : IDL.Func([StripeConfiguration], [], []),
+    'transform' : IDL.Func(
+        [TransformationInput],
+        [TransformationOutput],
+        ['query'],
+      ),
+    'updateOrderPaymentIntent' : IDL.Func([IDL.Nat, IDL.Text], [], []),
+    'updateOrderStatus' : IDL.Func([IDL.Nat, OrderStatus], [], []),
+    'updateProduct' : IDL.Func([IDL.Nat, ProductInput], [], []),
   });
 };
 

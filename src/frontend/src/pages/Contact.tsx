@@ -1,4 +1,4 @@
-import { Clock, Instagram, Mail } from "lucide-react";
+import { Clock, Mail } from "lucide-react";
 import { SiInstagram } from "react-icons/si";
 
 export default function Contact() {
@@ -27,11 +27,11 @@ export default function Contact() {
             <div>
               <h3 className="font-black text-base mb-1">Email Us</h3>
               <a
-                href="mailto:hello@thecozyhook.com"
+                href="mailto:crochetcomm1@gmail.com"
                 className="text-primary font-semibold hover:underline"
                 data-ocid="contact.link"
               >
-                hello@thecozyhook.com
+                crochetcomm1@gmail.com
               </a>
               <p className="text-sm text-muted-foreground mt-1">
                 For orders, custom requests, and general questions.
@@ -47,13 +47,13 @@ export default function Contact() {
             <div>
               <h3 className="font-black text-base mb-1">Instagram</h3>
               <a
-                href="https://instagram.com/thecozyhook"
+                href="https://instagram.com/crochet.comm_"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-primary font-semibold hover:underline"
                 data-ocid="contact.link"
               >
-                @thecozyhook
+                @crochet.comm_
               </a>
               <p className="text-sm text-muted-foreground mt-1">
                 Follow us for sneak peeks, crochet tips, and behind-the-scenes

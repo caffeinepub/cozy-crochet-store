@@ -1,8 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
+import { useInternetIdentity } from "@/hooks/useInternetIdentity";
 import { Link, useLocation } from "@tanstack/react-router";
-import { Menu, ShoppingCart, X } from "lucide-react";
+import { Menu, Package, Settings, ShoppingCart, X } from "lucide-react";
 import { useState } from "react";
+import { SiInstagram } from "react-icons/si";
 
 const NAV_LINKS = [
   { label: "Home", to: "/" },
@@ -16,6 +18,7 @@ export default function Header() {
   const { count, openCart } = useCart();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { identity } = useInternetIdentity();
 
   return (
     <header className="sticky top-0 z-50 bg-card border-b border-border shadow-xs">
@@ -25,7 +28,7 @@ export default function Header() {
           <Link to="/" className="flex items-center gap-2 flex-shrink-0">
             <span className="text-2xl">🧶</span>
             <span className="font-black text-xl text-foreground tracking-tight">
-              The Cozy Hook
+              crochetcomm
             </span>
           </Link>
 
@@ -52,6 +55,45 @@ export default function Header() {
 
           {/* Right icons */}
           <div className="flex items-center gap-2">
+            <a
+              href="https://instagram.com/crochet.comm_"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+              className="hidden md:flex items-center justify-center w-8 h-8 rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors"
+            >
+              <SiInstagram className="w-4 h-4" />
+            </a>
+
+            {identity && (
+              <Link
+                to="/my-orders"
+                data-ocid="nav.my_orders.link"
+                className={`hidden md:flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+                  location.pathname === "/my-orders"
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
+                }`}
+              >
+                <Package className="w-3.5 h-3.5" />
+                My Orders
+              </Link>
+            )}
+
+            <Link
+              to="/admin"
+              data-ocid="nav.admin.link"
+              className={`hidden md:flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+                location.pathname === "/admin"
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
+              }`}
+              aria-label="Admin panel"
+            >
+              <Settings className="w-3.5 h-3.5" />
+              Admin
+            </Link>
+
             <Button
               variant="ghost"
               size="icon"
@@ -68,7 +110,6 @@ export default function Header() {
               )}
             </Button>
 
-            {/* Mobile menu button */}
             <Button
               variant="ghost"
               size="icon"
@@ -104,6 +145,43 @@ export default function Header() {
               {link.label}
             </Link>
           ))}
+          {identity && (
+            <Link
+              to="/my-orders"
+              onClick={() => setMobileOpen(false)}
+              data-ocid="nav.my_orders.link"
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${
+                location.pathname === "/my-orders"
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
+              }`}
+            >
+              <Package className="w-4 h-4" />
+              My Orders
+            </Link>
+          )}
+          <Link
+            to="/admin"
+            onClick={() => setMobileOpen(false)}
+            data-ocid="nav.admin.link"
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${
+              location.pathname === "/admin"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
+            }`}
+          >
+            <Settings className="w-4 h-4" />
+            Admin
+          </Link>
+          <a
+            href="https://instagram.com/crochet.comm_"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors"
+          >
+            <SiInstagram className="w-4 h-4" />
+            Instagram
+          </a>
         </div>
       )}
     </header>

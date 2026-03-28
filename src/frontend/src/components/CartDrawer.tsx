@@ -2,20 +2,19 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/context/CartContext";
+import { useNavigate } from "@tanstack/react-router";
 import { Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
-import { toast } from "sonner";
 
 export default function CartDrawer() {
   const { items, isOpen, closeCart, removeItem, updateQty, total, count } =
     useCart();
+  const navigate = useNavigate();
 
   if (!isOpen) return null;
 
   const handleCheckout = () => {
     closeCart();
-    toast.success(
-      "Order placed! 💕 Thank you for your purchase. We'll be in touch soon!",
-    );
+    navigate({ to: "/checkout" });
   };
 
   return (
@@ -96,7 +95,7 @@ export default function CartDrawer() {
                         {item.product.name}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        ${item.product.price.toFixed(2)}
+                        ₹{item.product.price.toFixed(2)}
                       </p>
                       <div className="flex items-center gap-2 mt-2">
                         <Button
@@ -124,7 +123,7 @@ export default function CartDrawer() {
                     </div>
                     <div className="flex flex-col items-end gap-2">
                       <span className="font-black text-sm">
-                        ${(item.product.price * item.quantity).toFixed(2)}
+                        ₹{(item.product.price * item.quantity).toFixed(2)}
                       </span>
                       <Button
                         variant="ghost"
@@ -143,12 +142,13 @@ export default function CartDrawer() {
 
             <div className="p-5 border-t border-border flex flex-col gap-4">
               <p className="text-xs text-center text-muted-foreground">
-                Made with care 💕 | Easy ordering ✨ | Fast response 🌸
+                Made with care 💕 | Secure payment via Stripe ✨ | Fast shipping
+                🌸
               </p>
               <Separator />
               <div className="flex justify-between items-center">
                 <span className="font-bold">Total</span>
-                <span className="font-black text-xl">${total.toFixed(2)}</span>
+                <span className="font-black text-xl">₹{total.toFixed(2)}</span>
               </div>
               <Button
                 className="w-full rounded-full font-bold text-base py-6"

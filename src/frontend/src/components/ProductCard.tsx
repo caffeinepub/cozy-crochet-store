@@ -49,7 +49,7 @@ export default function ProductCard({ product, index = 1 }: ProductCardProps) {
         </p>
         <div className="flex items-center justify-between mt-2">
           <span className="font-black text-lg text-foreground">
-            ${product.price.toFixed(2)}
+            ₹{product.price.toFixed(2)}
           </span>
           <Button
             size="sm"

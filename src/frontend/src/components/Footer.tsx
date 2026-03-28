@@ -28,7 +28,7 @@ export default function Footer() {
           <div>
             <div className="flex items-center gap-2 mb-3">
               <span className="text-2xl">🧶</span>
-              <span className="font-black text-lg">The Cozy Hook</span>
+              <span className="font-black text-lg">crochet.comm_</span>
             </div>
             <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
               Stay cozy with new arrivals, behind-the-scenes peeks, and special
@@ -66,6 +66,7 @@ export default function Footer() {
                 { label: "Custom Orders", to: "/custom-orders" },
                 { label: "About Us", to: "/about" },
                 { label: "Contact", to: "/contact" },
+                { label: "My Orders", to: "/my-orders" },
               ].map((link) => (
                 <li key={link.to}>
                   <Link
@@ -87,9 +88,9 @@ export default function Footer() {
             </h4>
             <ul className="flex flex-col gap-2 text-sm text-muted-foreground">
               <li className="font-medium">📦 Ships in 3–5 business days</li>
-              <li className="font-medium">💌 hello@thecozyhook.com</li>
+              <li className="font-medium">💌 crochetcomm1@gmail.com</li>
               <li className="font-medium">🔄 Easy returns within 14 days</li>
-              <li className="font-medium">🛡️ Secure checkout</li>
+              <li className="font-medium">🛡️ Secure checkout via Stripe</li>
             </ul>
           </div>
 
@@ -100,7 +101,7 @@ export default function Footer() {
             </h4>
             <div className="flex gap-3 mb-4">
               <a
-                href="https://instagram.com/thecozyhook"
+                href="https://instagram.com/crochet.comm_"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
@@ -109,7 +110,7 @@ export default function Footer() {
                 <SiInstagram className="w-4 h-4" />
               </a>
               <a
-                href="https://pinterest.com/thecozyhook"
+                href="https://pinterest.com/crochetcomm"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Pinterest"
@@ -118,7 +119,7 @@ export default function Footer() {
                 <SiPinterest className="w-4 h-4" />
               </a>
               <a
-                href="https://facebook.com/thecozyhook"
+                href="https://facebook.com/crochetcomm"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Facebook"
@@ -128,8 +129,8 @@ export default function Footer() {
               </a>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Share your crochet orders using{" "}
-              <span className="font-bold text-foreground">#TheCozyhook</span> 🌸
+              Share your orders using{" "}
+              <span className="font-bold text-foreground">#crochetcomm</span> 🌸
             </p>
           </div>
         </div>

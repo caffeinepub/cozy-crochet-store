@@ -5,13 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { PRODUCTS, REVIEWS } from "@/data/products";
-import { useAddReview } from "@/hooks/useQueries";
+import { REVIEWS } from "@/data/products";
+import type { LocalProduct } from "@/data/products";
+import {
+  useAddReview,
+  useGetAllReviews,
+  useGetProducts,
+} from "@/hooks/useQueries";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-
-const FEATURED = PRODUCTS.slice(0, 4);
 
 export default function Home() {
   const [reviewName, setReviewName] = useState("");
@@ -19,6 +22,33 @@ export default function Home() {
   const [reviewRating, setReviewRating] = useState(5);
   const [newsletter, setNewsletter] = useState("");
   const addReview = useAddReview();
+
+  const { data: backendProducts } = useGetProducts();
+  const { data: backendReviews } = useGetAllReviews();
+
+  const featuredProducts: LocalProduct[] = (backendProducts ?? [])
+    .slice(0, 4)
+    .map((p) => ({
+      id: Number(p.id),
+      name: p.name,
+      category: p.category,
+      price: p.price,
+      rating: 5,
+      image: p.image.getDirectURL(),
+      description: p.description,
+    }));
+
+  const hasFeatured = featuredProducts.length > 0;
+
+  const displayReviews =
+    backendReviews && backendReviews.length > 0
+      ? backendReviews.map((r) => ({
+          name: r.customerName,
+          rating: Number(r.rating),
+          comment: r.comment,
+          avatar: r.customerName.charAt(0).toUpperCase(),
+        }))
+      : REVIEWS;
 
   const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -144,22 +174,43 @@ export default function Home() {
               Each piece made to order with premium yarns and big doses of love
             </p>
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            {FEATURED.map((p, i) => (
-              <ProductCard key={p.id} product={p} index={i + 1} />
-            ))}
-          </div>
-          <div className="text-center mt-10">
-            <Button
-              size="lg"
-              variant="outline"
-              className="rounded-full font-bold px-10"
-              asChild
-              data-ocid="featured.secondary_button"
-            >
-              <Link to="/shop">View All Products →</Link>
-            </Button>
-          </div>
+
+          {hasFeatured ? (
+            <>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                {featuredProducts.map((p, i) => (
+                  <ProductCard key={p.id} product={p} index={i + 1} />
+                ))}
+              </div>
+              <div className="text-center mt-10">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="rounded-full font-bold px-10"
+                  asChild
+                  data-ocid="featured.secondary_button"
+                >
+                  <Link to="/shop">View All Products →</Link>
+                </Button>
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-12" data-ocid="featured.empty_state">
+              <span className="text-5xl">🧶</span>
+              <p className="mt-4 font-semibold text-muted-foreground">
+                New products coming soon — stay tuned!
+              </p>
+              <Button
+                size="lg"
+                variant="outline"
+                className="rounded-full font-bold px-10 mt-6"
+                asChild
+                data-ocid="featured.secondary_button"
+              >
+                <Link to="/shop">Visit the Shop →</Link>
+              </Button>
+            </div>
+          )}
         </div>
       </section>
 
@@ -221,9 +272,9 @@ export default function Home() {
             </h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {REVIEWS.map((r, idx) => (
+            {displayReviews.map((r, idx) => (
               <div
-                key={r.name}
+                key={`${r.name}-${idx}`}
                 className="bg-card rounded-2xl p-6 shadow-card flex flex-col gap-4"
                 data-ocid={`reviews.item.${idx + 1}`}
               >
